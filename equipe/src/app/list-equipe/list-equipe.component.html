@@ -1,0 +1,45 @@
+<h2>Liste des équipes</h2>
+
+<button (click)="showAddForm()">Ajouter une équipe</button>
+
+<div *ngIf="showForm" class="form-container">
+  <h3>{{ isEditing ? 'Modifier' : 'Ajouter' }} Équipe</h3>
+  <form (ngSubmit)="isEditing ? updateEquipe() : addEquipe()">
+    <div>
+      <label>Nom:</label>
+      <input [(ngModel)]="currentEquipe.nomEquipe" name="nomEquipe" required>
+    </div>
+    <div>
+      <label>Niveau:</label>
+      <select [(ngModel)]="currentEquipe.niveau" name="niveau" required>
+        <option *ngFor="let niveau of niveaux" [ngValue]="niveau">
+          {{ getNiveauDisplay(niveau) }}
+        </option>
+      </select>
+    </div>
+    <button type="submit">{{ isEditing ? 'Modifier' : 'Ajouter' }}</button>
+    <button type="button" (click)="hideForm()">Annuler</button>
+  </form>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+      <th>Niveau</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let equipe of equipes">
+      <td>{{ equipe.idEquipe }}</td>
+      <td>{{ equipe.nomEquipe }}</td>
+      <td>{{ getNiveauDisplay(equipe.niveau) }}</td>
+      <td>
+        <button (click)="showEditForm(equipe)">Modifier</button>
+        <button (click)="deleteEquipe(equipe.idEquipe)" class="delete">Supprimer</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
