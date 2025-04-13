@@ -16,7 +16,7 @@ pipeline {
         DOCKER_USERNAME = 'zeinebmaatalli'
         DOCKER_PASSWORD = 'Zeineb123'
         COMPOSE_FILE = 'docker-compose.yml'
-         NEXUS_REPO_URL = 'http://172.17.0.1:8081/repository/maven-releases/'
+        // NEXUS_REPO_URL = 'http://172.17.0.1:8081/repository/maven-releases/'
     }
 
     stages {
@@ -69,43 +69,43 @@ pipeline {
             }
         }
 
-        // stage('7. Deploy to Nexus') {
-        //     steps {
-        //         dir('zeinebmaatalli-4TWIN1-G6') {
-        //             sh 'mvn deploy -DskipTests'
-        //         }
-        //     }
-        // }
-stage('Deploy to Nexus') {
-    steps {
-        dir('zeinebmaatalli-4TWIN1-G6') {
-            configFileProvider([configFile(fileId: '098840e5-3f3f-4eef-9684-cc667944fa7b', variable: 'MAVEN_SETTINGS')]) {
-                sh """
-                    mvn deploy \
-                        -s $MAVEN_SETTINGS \
-                        -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL 
-                       
-                """
+        stage('7. Deploy to Nexus') {
+            steps {
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn deploy -DskipTests'
+                }
             }
         }
-    }
-}
+// stage('Deploy to Nexus') {
+//     steps {
+//         dir('zeinebmaatalli-4TWIN1-G6') {
+//             configFileProvider([configFile(fileId: '098840e5-3f3f-4eef-9684-cc667944fa7b', variable: 'MAVEN_SETTINGS')]) {
+//                 sh """
+//                     mvn deploy \
+//                         -s $MAVEN_SETTINGS \
+//                         -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL 
+                       
+//                 """
+//             }
+//         }
+//     }
+// }
 
-  stage('Download JAR from Nexus') {
-    steps {
-        dir('zeinebmaatalli-4TWIN1-G6') {
-            // Download JAR using Maven or wget (with auth)
-            sh """
-                mvn org.apache.maven.plugins:maven-dependency-plugin:3.6.1:get \
-                    -DremoteRepositories=dev::::$NEXUS_REPO_URL \
-                    -Dartifact=tn.esprit.spring:kaddem:0.0.1:jar \
-                    -Dtransitive=false \
-                    -s $MAVEN_SETTINGS \
-                    -Ddest=./kaddem-0.0.1.jar
-            """
-        }
-    }
-}
+//  stage('Download JAR from Nexus') {
+//     steps {
+//         dir('zeinebmaatalli-4TWIN1-G6') {
+//             // Download JAR using Maven or wget (with auth)
+//             sh """
+//                 mvn org.apache.maven.plugins:maven-dependency-plugin:3.6.1:get \
+//                     -DremoteRepositories=dev::::$NEXUS_REPO_URL \
+//                     -Dartifact=tn.esprit.spring:kaddem:0.0.1:jar \
+//                     -Dtransitive=false \
+//                     -s $MAVEN_SETTINGS \
+//                     -Ddest=./kaddem-0.0.1.jar
+//             """
+//         }
+//     }
+// }
 
 stage('Build Backend Docker Image') {
     steps {
