@@ -3,14 +3,14 @@ import { EquipeService, Equipe, Niveau } from '../services/equipe.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-list-equipe',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
+  imports: [FormsModule, CommonModule, RouterModule,HttpClientModule],
   templateUrl: './list-equipe.component.html',
-  styleUrls: ['./list-equipe.component.css'],
- providers: [EquipeService] 
+  styleUrls: ['./list-equipe.component.css']
 })
 export class ListEquipeComponent implements OnInit {
   equipes: Equipe[] = [];
