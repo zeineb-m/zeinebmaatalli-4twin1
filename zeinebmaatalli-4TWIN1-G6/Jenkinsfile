@@ -7,40 +7,47 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'zeinebmaatalli/kaddem'    // Backend image
-        FRONT_IMAGE = 'zeinebmaatalli/front-equipe' // Frontend image
+        IMAGE_NAME = 'zeinebmaatalli/kaddem'               // Backend image
+        FRONT_IMAGE = 'zeinebmaatalli/front-equipe'        // Frontend image
         DOCKER_USERNAME = 'zeinebmaatalli'
         DOCKER_PASSWORD = 'Zeineb123'
         COMPOSE_FILE = 'docker-compose.yml'
     }
 
     stages {
-
-        stage('1. Clone Repository') {
+        stage('1. Clone Backend Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/zeineb-m/zeinebmaatalli-4TWIN1-G6.git'
             }
         }
 
-        stage('2. Check Maven Version') {
+        stage('2. Clone Frontend Repository') {
+            steps {
+                sh '''
+                    git clone https://github.com/zeineb-m/equipe.git ../equipe
+                '''
+            }
+        }
+
+        stage('3. Check Maven Version') {
             steps {
                 sh 'mvn -version'
             }
         }
 
-        stage('3. Compile Project') {
+        stage('4. Compile Project') {
             steps {
                 sh 'mvn clean compile'
             }
         }
 
-        stage('4. Run Tests') {
+        stage('5. Run Tests') {
             steps {
                 sh 'mvn test'
             }
         }
 
-        stage('5. SonarQube Analysis') {
+        stage('6. SonarQube Analysis') {
             steps {
                 sh '''
                     mvn sonar:sonar \
@@ -49,32 +56,31 @@ pipeline {
             }
         }
 
-        stage('6. Package Application') {
+        stage('7. Package Application') {
             steps {
                 sh 'mvn package -DskipTests'
             }
         }
 
-        stage('7. Deploy to Nexus') {
+        stage('8. Deploy to Nexus') {
             steps {
                 sh 'mvn deploy -DskipTests'
             }
         }
 
-        stage('8. Build Backend Docker Image') {
+        stage('9. Build Backend Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-stage('Check structure') {
-    steps {
-        sh 'ls -la ../'
-    }
-}
+        stage('10. Build Frontend Docker Image') {
+            steps {
+                sh 'docker build -t $FRONT_IMAGE -f ../equipe/dockerfile ../equipe'
+            }
+        }
 
-
-        stage('10. Push Docker Images to Docker Hub') {
+        stage('11. Push Docker Images to Docker Hub') {
             steps {
                 sh '''
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -84,7 +90,7 @@ stage('Check structure') {
             }
         }
 
-        stage('11. Restart Services with Docker Compose') {
+        stage('12. Restart Services with Docker Compose') {
             steps {
                 sh '''
                     docker-compose -f $COMPOSE_FILE down || true
