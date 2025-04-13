@@ -18,11 +18,12 @@ pipeline {
         COMPOSE_FILE = 'docker-compose.yml'
     }
 
- stage('1. Clone Repository') {
-    steps {
-        git branch: 'main', url: 'https://github.com/zeineb-m/zeinebmaatalli-4twin1.git'
-    }
-}
+    stages {
+        stage('1. Clone Repository') {
+            steps {
+                git branch: 'main', url: 'https://github.com/zeineb-m/zeinebmaatalli-4twin1.git'
+            }
+        }
 
         stage('2. Check Maven Version') {
             steps {
