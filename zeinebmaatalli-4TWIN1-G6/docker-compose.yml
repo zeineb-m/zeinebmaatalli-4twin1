@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # Service MySQL pour la base de données
   mysql:
     image: mysql:8
     container_name: mysql
@@ -13,29 +12,25 @@ services:
     volumes:
       - db:/var/lib/mysql
 
-  # Service Backend (Spring Boot)
   kaddem:
-    build:
-     container_name: kaddem
+    image: zeinebmaatalli/kaddem
+    container_name: kaddem
     ports:
-      - "8082:8082"  # Expose le port 8082 du backend
+      - "8082:8082"
     depends_on:
-      - mysql  # Assure-toi que MySQL est prêt avant de démarrer le backend
+      - mysql
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/kaddem
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
 
-  # Service Frontend (Angular)
   front-equipe:
-    build:
-      context: ../equipe        # Chemin relatif vers le frontend Angular
-      dockerfile: dockerfile    # Dockerfile du frontend Angular
+    image: zeinebmaatalli/front-equipe
     container_name: front-equipe
     ports:
-      - "8083:8083"  # Expose le port 83 du frontend Angular
+      - "8083:8083"
     depends_on:
-      - kaddem  # Assure-toi que le backend est prêt avant de démarrer le frontend
+      - kaddem
 
 volumes:
   db:
