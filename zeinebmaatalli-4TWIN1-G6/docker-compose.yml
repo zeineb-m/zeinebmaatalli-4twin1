@@ -16,14 +16,15 @@ services:
     image: zeinebmaatalli/kaddem
     container_name: kaddem
     ports:
-      - "8082:8082"
+      - "8089:8089"
     depends_on:
       - mysql
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/kaddem
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/kaddem?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
-
+     restart: unless-stopped
+     
   front-equipe:
     image: zeinebmaatalli/front-equipe
     container_name: front-equipe
@@ -31,6 +32,7 @@ services:
       - "8083:8083"
     depends_on:
       - kaddem
+    
 
 volumes:
   db:
