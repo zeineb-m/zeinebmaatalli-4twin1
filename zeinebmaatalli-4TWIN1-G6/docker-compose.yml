@@ -33,7 +33,7 @@ services:
       dockerfile: dockerfile    # Dockerfile du frontend Angular
     container_name: front-equipe
     ports:
-      - "83:83"  # Expose le port 83 du frontend Angular
+      - "8083:8083"  # Expose le port 83 du frontend Angular
     depends_on:
       - kaddem  # Assure-toi que le backend est prêt avant de démarrer le frontend
 
