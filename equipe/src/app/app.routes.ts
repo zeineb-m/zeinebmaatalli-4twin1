@@ -2,13 +2,6 @@ import { Routes } from '@angular/router';
 import { ListEquipeComponent } from './list-equipe/list-equipe.component';
 
 export const routes: Routes = [
-  {
-    path: 'list',
-    component: ListEquipeComponent
-  },
-  {
-    path: '',
-    redirectTo: 'list',
-    pathMatch: 'full'
-  }
+  { path: 'list', component: ListEquipeComponent },
+  { path: '', redirectTo: 'list', pathMatch: 'full' }
 ];
