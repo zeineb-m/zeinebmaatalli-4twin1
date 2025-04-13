@@ -91,14 +91,29 @@ stage('Deploy to Nexus') {
     }
 }
 
-        stage('8. Build Backend Docker Image') {
-            steps {
-                dir('zeinebmaatalli-4TWIN1-G6') {
-                    sh 'docker build -t $IMAGE_NAME .'
-                }
-            }
+  stage('Download JAR from Nexus') {
+    steps {
+        dir('zeinebmaatalli-4TWIN1-G6') {
+            // Download JAR using Maven or wget (with auth)
+            sh """
+                mvn org.apache.maven.plugins:maven-dependency-plugin:3.6.1:get \
+                    -DremoteRepositories=dev::::$NEXUS_REPO_URL \
+                    -Dartifact=tn.esprit.spring:kaddem:0.0.1:jar \
+                    -Dtransitive=false \
+                    -s $MAVEN_SETTINGS \
+                    -Ddest=./kaddem-0.0.1.jar
+            """
         }
+    }
+}
 
+stage('Build Backend Docker Image') {
+    steps {
+        dir('zeinebmaatalli-4TWIN1-G6') {
+            sh 'docker build -t $IMAGE_NAME .'
+        }
+    }
+}
         stage('9. Build Frontend Docker Image') {
             steps {
                 sh 'docker build -t $FRONT_IMAGE -f equipe/dockerfile equipe'
