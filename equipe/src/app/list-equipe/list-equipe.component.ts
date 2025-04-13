@@ -9,7 +9,8 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './list-equipe.component.html',
-  styleUrls: ['./list-equipe.component.css']
+  styleUrls: ['./list-equipe.component.css'],
+ providers: [EquipeService] 
 })
 export class ListEquipeComponent implements OnInit {
   equipes: Equipe[] = [];
