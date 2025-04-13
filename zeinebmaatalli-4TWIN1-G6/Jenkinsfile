@@ -7,7 +7,8 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = 'zeinebmaatalli/kaddem'
+        IMAGE_NAME = 'zeinebmaatalli/kaddem'    // Backend image
+        FRONT_IMAGE = 'zeinebmaatalli/front-equipe' // Frontend image
         DOCKER_USERNAME = 'zeinebmaatalli'
         DOCKER_PASSWORD = 'Zeineb123'
         COMPOSE_FILE = 'docker-compose.yml'
@@ -60,26 +61,33 @@ pipeline {
             }
         }
 
-        stage('8. Build Docker Image') {
+        stage('8. Build Backend Docker Image') {
             steps {
                 sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
-        stage('9. Push Docker Image to Docker Hub') {
+        stage('9. Build Frontend Angular Docker Image') {
+            steps {
+                sh 'docker build -t $FRONT_IMAGE -f ../equipe/dockerfile ../equipe'
+            }
+        }
+
+        stage('10. Push Docker Images to Docker Hub') {
             steps {
                 sh '''
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
                     docker push $IMAGE_NAME
+                    docker push $FRONT_IMAGE
                 '''
             }
         }
 
-        stage('10. Restart Services with Docker Compose') {
+        stage('11. Restart Services with Docker Compose') {
             steps {
                 sh '''
                     docker-compose -f $COMPOSE_FILE down || true
-                    docker-compose -f $COMPOSE_FILE up -d
+                    docker-compose -f $COMPOSE_FILE up -d --build
                 '''
             }
         }
