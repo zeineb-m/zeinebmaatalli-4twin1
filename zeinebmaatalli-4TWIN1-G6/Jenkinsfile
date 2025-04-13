@@ -1,10 +1,10 @@
 pipeline {
     agent any
- options {
+
+    options {
         skipDefaultCheckout()
     }
 
-  
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
@@ -19,72 +19,78 @@ pipeline {
     }
 
     stages {
-        stage('1. Clone Backend Repository') {
+        stage('1. Clone Repository') {
             steps {
                 git branch: 'main', url: 'https://github.com/zeineb-m/zeinebmaatalli-4TWIN1-G6.git'
             }
         }
 
-        stage('2. Clone Frontend Repository') {
+        stage('2. Check Maven Version') {
             steps {
-                sh '''
-                    git clone https://github.com/zeineb-m/equipe.git ../equipe
-                '''
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn -version'
+                }
             }
         }
 
-        stage('3. Check Maven Version') {
+        stage('3. Compile Project') {
             steps {
-                sh 'mvn -version'
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn clean compile'
+                }
             }
         }
 
-        stage('4. Compile Project') {
+        stage('4. Run Tests') {
             steps {
-                sh 'mvn clean compile'
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn test'
+                }
             }
         }
 
-        stage('5. Run Tests') {
+        stage('5. SonarQube Analysis') {
             steps {
-                sh 'mvn test'
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.login=squ_5cd14c3d1442652f6739461650faa58ab2be84ac
+                    '''
+                }
             }
         }
 
-        stage('6. SonarQube Analysis') {
+        stage('6. Package Application') {
             steps {
-                sh '''
-                    mvn sonar:sonar \
-                    -Dsonar.login=squ_5cd14c3d1442652f6739461650faa58ab2be84ac
-                '''
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn package -DskipTests'
+                }
             }
         }
 
-        stage('7. Package Application') {
+        stage('7. Deploy to Nexus') {
             steps {
-                sh 'mvn package -DskipTests'
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'mvn deploy -DskipTests'
+                }
             }
         }
 
-        stage('8. Deploy to Nexus') {
+        stage('8. Build Backend Docker Image') {
             steps {
-                sh 'mvn deploy -DskipTests'
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh 'docker build -t $IMAGE_NAME .'
+                }
             }
         }
 
-        stage('9. Build Backend Docker Image') {
+        stage('9. Build Frontend Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh 'docker build -t $FRONT_IMAGE -f equipe/dockerfile equipe'
             }
         }
 
-        stage('10. Build Frontend Docker Image') {
-            steps {
-                sh 'docker build -t $FRONT_IMAGE -f ../equipe/dockerfile ../equipe'
-            }
-        }
-
-        stage('11. Push Docker Images to Docker Hub') {
+        stage('10. Push Docker Images to Docker Hub') {
             steps {
                 sh '''
                     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -94,12 +100,14 @@ pipeline {
             }
         }
 
-        stage('12. Restart Services with Docker Compose') {
+        stage('11. Restart Services with Docker Compose') {
             steps {
-                sh '''
-                    docker-compose -f $COMPOSE_FILE down || true
-                    docker-compose -f $COMPOSE_FILE up -d --build
-                '''
+                dir('zeinebmaatalli-4TWIN1-G6') {
+                    sh '''
+                        docker-compose -f $COMPOSE_FILE down || true
+                        docker-compose -f $COMPOSE_FILE up -d --build
+                    '''
+                }
             }
         }
     }
