@@ -67,11 +67,12 @@ pipeline {
             }
         }
 
-        stage('9. Build Frontend Angular Docker Image') {
-            steps {
-                sh 'docker build -t $FRONT_IMAGE -f ../equipe/dockerfile ../equipe'
-            }
-        }
+stage('Check structure') {
+    steps {
+        sh 'ls -la ../'
+    }
+}
+
 
         stage('10. Push Docker Images to Docker Hub') {
             steps {
