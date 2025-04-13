@@ -1,9 +1,7 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout()
-    }
+  
     tools {
         jdk 'JAVA_HOME'
         maven 'M2_HOME'
