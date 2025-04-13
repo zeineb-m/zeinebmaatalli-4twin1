@@ -1,11 +1,29 @@
-# Étape 1 : build Angular app
-FROM node:18-alpine as build
-WORKDIR /app
-COPY . .
-RUN npm install && npm run build --prod
+# Étape 1 : Build de l'application Angular
+FROM node:18-alpine AS build
 
-# Étape 2 : servir avec nginx
+WORKDIR /app
+
+# Copier les fichiers package + angular config
+COPY package.json package-lock.json angular.json tsconfig.json tsconfig.app.json ./ 
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le reste des fichiers
+COPY . .
+
+# Build production Angular
+RUN npx ng build --configuration=production --output-path=dist
+
+# Étape 2 : Serveur Nginx
 FROM nginx:alpine
+
+# Copier les fichiers buildés
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 83
+
+# Ajouter la config Nginx personnalisée
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8083
+
 CMD ["nginx", "-g", "daemon off;"]
