@@ -76,17 +76,20 @@ pipeline {
         //     }
         // }
 stage('Deploy to Nexus') {
-            steps {
-                configFileProvider([configFile(fileId: '098840e5-3f3f-4eef-9684-cc667944fa7b', variable: 'MAVEN_SETTINGS')]) {
-                    sh """
-                        mvn deploy \
-                            -s $MAVEN_SETTINGS \
-                            -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL \
-                            -Dversion=1.0.0
-                    """
-                }
+    steps {
+        dir('zeinebmaatalli-4TWIN1-G6') {
+            configFileProvider([configFile(fileId: '098840e5-3f3f-4eef-9684-cc667944fa7b', variable: 'MAVEN_SETTINGS')]) {
+                sh """
+                    mvn deploy \
+                        -s $MAVEN_SETTINGS \
+                        -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL \
+                        -Dversion=1.0.0
+                """
             }
         }
+    }
+}
+
         stage('8. Build Backend Docker Image') {
             steps {
                 dir('zeinebmaatalli-4TWIN1-G6') {
