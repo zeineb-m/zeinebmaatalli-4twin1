@@ -83,8 +83,8 @@ stage('Deploy to Nexus') {
                 sh """
                     mvn deploy \
                         -s $MAVEN_SETTINGS \
-                        -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL \
-                        -Dversion=1.0.0
+                        -DaltDeploymentRepository=dev::default::$NEXUS_REPO_URL 
+                       
                 """
             }
         }
