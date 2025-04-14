@@ -55,7 +55,7 @@ pipeline {
                 dir('zeinebmaatalli-4TWIN1-G6') {
                     sh '''
                         mvn sonar:sonar \
-                        -Dsonar.login=f514da16352f623047c6a455cd05c197d7160295
+                        -Dsonar.login=squ_3cb2992aaa7ca0a4cbd9d35a29f52091ff332dfb
                     '''
                 }
             }
